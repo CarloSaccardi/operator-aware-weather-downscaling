@@ -1,0 +1,48 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.so
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+env/
+
+# Checkpoints — symlinked to the GeoDiff repo, never committed (21 GB)
+saved_models
+*.ckpt
+*.pt
+
+# Experiment tracking / job output
+wandb/
+*.log
+*.err
+job-*
+
+# Plotting OUTPUT only. The scripts in paper_plotting/ are tracked on purpose:
+# they were untracked in the old repo, which meant one shared copy across every
+# branch with no history to recover from.
+paper_plotting/_cache/
+paper_plotting/_cache_metrics/
+paper_plotting/_cache_zeta/
+paper_plotting/figures/
+paper_plotting/tables/
+*.png
+*.pdf
+*.gif
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.sh
+
+# Local credentials and private configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.local.yaml
+*.local.yml

@@ -1,0 +1,49 @@
+# =========================
+# A_theta trained directly for a ~50 km coarse source.
+#
+# NOT the arm the paper runs -- see yaml_configs/GeoDiff/geodiff_test_50km.yaml,
+# which reuses the ~25 km A_theta and area-averages its output instead. Because
+# the ~50 km field is *defined* as the ~25 km field area-averaged by 2, and that
+# pooling is linear, the reused operator reproduces the 25 km residual on the
+# coarse grid exactly, and the whole coarse-source swap becomes inference-only.
+#
+# This config is kept as the independent check on that claim: it trains a fresh
+# operator whose 3x3 convolutions act at ~50 km spacing rather than ~25 km, which
+# is the only way the two differ. Run it if a GPU is free; the result should match.
+#
+# Identical to a_operator_train.yaml except that ERA5 is area-averaged by 2 on
+# load (77x77 -> 39x39, ~25 km -> ~50 km) and A_theta emits that grid. This is
+# the whole cost of moving to a different coarse product: the diffusion prior
+# never sees ERA5 and is reused unchanged, so nothing else is retrained.
+# =========================
+dataset_cerra: "data/CERRA"
+dataset_era5: "data/ERA5"
+model: AOperator
+subset_ds: 0
+seed: 32
+n_workers: 16
+load: null
+restore_opt: 0
+precision: "16-mixed"
+eval: null
+wandb_project: null
+run_name: "AOperator"
+# =========================
+# DATASET SETTINGS
+# =========================
+img_in_channels: 7
+img_out_channels: 6
+img_resolution: [77, 77]
+crop: True
+# Coarse source: 2 = ERA5 area-averaged to ~50 km. a_target_size is the grid
+# that leaves, and must match: ceil(77 / 2) = 39.
+era5_coarsen: 2
+a_target_size: [39, 39]
+# =========================
+# TRAINING SETTINGS
+# =========================
+val_interval: 1
+lr: 4.0e-3
+epochs: 500
+batch_size: 256
+channel_weights: [0.1, 0.1, 1.0, 0.1, 0.1, 1.0]

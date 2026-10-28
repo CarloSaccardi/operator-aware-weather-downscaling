@@ -1,0 +1,46 @@
+# =========================
+# GENERAL OPTIONS
+# =========================
+dataset_cerra: "data/CERRA"
+dataset_era5: "data/ERA5"
+model: CorrDiff                   # Model architecture
+subset_ds: 0                       # 0 = full dataset, >0 = subset size
+seed: 32
+n_workers: 64                      # Dataloader workers
+load: "saved_models/CorrDiff/model.ckpt"
+restore_opt: 1                     # 0 = do not restore optimizer
+precision: "16-mixed"              # 32 | 16 | 16-mixed | bf16
+eval: test                         # val | test | null → train
+wandb_project: null
+run_name: "CorrDiff"
+num_ensembles: 1
+# =========================
+# DATASET SETTINGS
+# =========================
+output_variables: null             # List of vars to predict
+img_in_channels: 6
+img_out_channels: 6
+img_resolution: [350, 350]
+data_subset_len: 800 #800 #128
+# =========================
+# MODEL SETTINGS
+# =========================
+N_grid_channels: null
+embedding_type: zero
+model_channels: 64
+channel_mult: [1, 2, 2, 2]
+attn_resolutions: [16]
+model_type: SongUNet
+gridtype: null
+geounet_checkpoint: "saved_models/GeoUNet/model.ckpt"
+# =========================
+# TRAINING SETTINGS
+# =========================
+val_interval: 1
+lr: 8.0e-4
+epochs: 1000
+batch_size: 16
+lr_decay: 1
+lr_rampup: 0
+checkpoint_level: 0
+channel_weights: [0.1, 0.1, 1.0, 0.1, 0.1, 1.0]

@@ -1,0 +1,38 @@
+# Core ML/DL frameworks
+torch==2.6.0
+torchvision==0.21.0
+torch-geometric==2.6.1
+pytorch-lightning==2.5.1
+torchmetrics==1.7.0
+
+# Data processing
+numpy==1.26.4
+pandas==2.2.3
+xarray==2025.3.1
+scipy==1.15.2
+
+# Visualization
+matplotlib==3.10.1
+plotly==6.0.1
+
+# Physics simulation
+nvidia-physicsnemo==1.1.0a0
+nvidia-dali-cuda120==1.49.0
+
+# Geospatial and meteorology
+cfgrib==0.9.15.0
+
+# Image processing
+scikit-image==0.25.2
+pillow==11.1.1
+imageio==2.37.0
+tifffile==2025.6.11
+
+# Experiment tracking and logging
+wandb==0.19.8
+
+# Configuration and utilities
+PyYAML==6.0.2
+tqdm==4.67.1
+easydict==1.13
+

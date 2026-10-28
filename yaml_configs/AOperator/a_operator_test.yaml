@@ -1,0 +1,32 @@
+# =========================
+# GENERAL OPTIONS
+# =========================
+dataset_cerra: "data/CERRA"
+dataset_era5: "data/ERA5"
+model: AOperator
+subset_ds: 0
+seed: 32
+n_workers: 16
+load: "saved_models/AOperator/model.ckpt"
+restore_opt: 0
+precision: "16-mixed"
+eval: test
+wandb_project: null
+run_name: "AOperator"
+
+# =========================
+# DATASET SETTINGS
+# =========================
+img_in_channels: 7
+img_out_channels: 6
+img_resolution: [77, 77]
+crop: True
+data_subset_len: null
+
+# =========================
+# TRAINING SETTINGS
+# =========================
+val_interval: 1
+lr: 4.0e-4
+epochs: 500
+batch_size: 128

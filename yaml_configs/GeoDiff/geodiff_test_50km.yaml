@@ -1,0 +1,83 @@
+# =========================
+# GeoDiff evaluated against a ~50 km coarse source.
+#
+# Nothing is retrained for this arm -- it is an inference-time change only.
+#
+# The prior checkpoint is the same as geodiff_test.yaml: it never sees ERA5, so
+# it does not care what resolution the coarse field is at. And A_theta is the
+# same ~25 km checkpoint as well, reused through a pooling wrapper: the ~50 km
+# ERA5 field is defined as the ~25 km field area-averaged by 2, and pooling P is
+# linear, so
+#
+#     y_50 - P(A_25(x))  =  P(y_25 - A_25(x)),
+#
+# the ~25 km operator residual measured on the coarser grid. That makes the reuse
+# exact rather than approximate. a_operator_native_size: [77, 77] is what selects
+# it -- without that flag the 77x77 weights would load silently under a 39x39
+# target and give a *different* operator, its 3x3 convs acting at ~50 km spacing.
+#
+# zeta = 10, the same value every other GeoDiff arm in the paper uses
+# (metrics_table.MODEL_SPECS and psd_logpdf.MODEL_SPECS both pin it). It carries
+# across unchanged because grad_norm: channel divides the guidance gradient by
+# its own per-variable norm before zeta multiplies it, so zeta is a scale-free
+# displacement budget. The residual y - A(x0) living on 39x39 instead of 77x77
+# changes that gradient's magnitude, not the unit vector zeta scales -- which is
+# exactly why no re-tuning is needed for the coarse-source swap.
+#
+# GENERAL OPTIONS
+# =========================
+dataset_cerra: "data/CERRA"
+dataset_era5: "data/ERA5"
+model: GeoDiff                   # Model architecture
+subset_ds: 0                       # 0 = full dataset, >0 = subset size
+seed: 32
+n_workers: 64                      # Dataloader workers
+load: "saved_models/GeoDiff/model.ckpt"
+restore_opt: 1                     # 0 = do not restore optimizer
+precision: "16-mixed"              # 32 | 16 | 16-mixed | bf16
+eval: test                         # val | test | null → train
+num_ensembles: 8
+zeta_lr: 10                        # same as every other GeoDiff arm; see header
+grad_norm: channel                 # channel = per-variable unit norm | global = DPS
+channel_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+wandb_project: null
+run_name: "GeoDiff"
+# =========================
+# DATASET SETTINGS
+# =========================
+output_variables: null             # List of vars to predict
+img_in_channels: 6
+img_out_channels: 6
+img_resolution: [350, 350]
+# Coarse source: ERA5 area-averaged to ~50 km. a_target_size is the grid the
+# guidance residual y - A(x0) lives on, and must match: ceil(77 / 2) = 39.
+era5_coarsen: 2
+a_target_size: [39, 39]
+data_subset_len: 1000
+# =========================
+# MODEL SETTINGS
+# =========================
+N_grid_channels: null
+embedding_type: zero
+model_channels: 64
+channel_mult: [1, 2, 2, 2]
+attn_resolutions: [16]
+model_type: SongUNet
+gridtype: null
+# Forward operator inside the DPS likelihood.
+#   a path -> learned A_theta;  null -> bicubic downsampling (the assumed operator).
+# These are the two arms of the operator ablation (E2).
+a_operator_ckpt: "saved_models/AOperator/model.ckpt"
+# The grid that checkpoint emits. Differs from a_target_size, so A_theta is built
+# at 77x77 and its output area-averaged to 39x39 -- see the header.
+a_operator_native_size: [77, 77]
+# =========================
+# TRAINING SETTINGS
+# =========================
+val_interval: 1
+lr: 4.0e-4
+epochs: 3000
+batch_size: 8
+lr_decay: 1
+lr_rampup: 0
+checkpoint_level: 0
