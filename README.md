@@ -1,7 +1,5 @@
 # Operator-Aware Posterior Sampling for Multivariate Weather Downscaling
 
-Code for the paper by **Carlo Saccardi, Rudolf Saathof, Geethu Joseph, and Justin Dauwels**, accepted at the **NeurIPS 2026 Tackling Climate Change with Machine Learning (TCCML) workshop**.
-
 We downscale ERA5 weather fields (~25 km) to CERRA resolution (~5.5 km) using diffusion posterior sampling. The method combines a high-resolution diffusion prior with two changes to the sampling guidance:
 
 - **A learned forward operator** maps high-resolution fields to the coarse source, capturing differences between reanalysis systems that a fixed downsampler cannot represent.
